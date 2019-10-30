@@ -292,11 +292,10 @@ def post(request):
 def messagedelete(request, message_id):
     try:
         get_message = Message.objects.filter(id=message_id).first()
+        get_message.delete()
     except:
         messages.info(request, 'すでに削除されています。')
         return redirect(to='/app')
-    else:
-        get_message.delete()
 
     return redirect(to='/app')
 
@@ -355,8 +354,6 @@ def gooddetail(request, message_id):
 @login_required(login_url='/admin/login/')
 def goodadd(request, message_id, good_id=None ):
     good_message = Message.objects.filter(id=message_id).first()
-    messages.info(request, 'すでに削除されています。')
-    return redirect(to='/app')
     if good_id:
         gd = Good.objects.filter(id=good_id).first()
         # Messageのsumを減らしておく
