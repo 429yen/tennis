@@ -357,7 +357,11 @@ def goodadd(request, message_id, good_id=None ):
     if good_id:
         gd = Good.objects.filter(id=good_id).first()
         # Messageのsumを減らしておく
-        good_message.sum -= int(gd.count)
+        try:
+            good_message.sum -= int(gd.count)
+        except:
+            messages.info(request, 'すでに削除されています。')
+            return redirect(to='/app')
     else:
         gd = Good()
 
@@ -380,21 +384,21 @@ def goodadd(request, message_id, good_id=None ):
             return redirect(to='/app')
 
         # goodを作成して保存
-        gd.message = good_message
-        gd.owner = request.user
-        whose = User.objects.filter(username=whose).first()
-        gd.whose = whose
-        gd.count = count
-        gd.comment =comment
         try:
+            gd.message = good_message
+            gd.owner = request.user
+            whose = User.objects.filter(username=whose).first()
+            gd.whose = whose
+            gd.count = count
+            gd.comment =comment
             gd.save()
+            # Messageのsumを増やす
+            good_message.sum += int(count)
+            good_message.save()
         except:
             messages.info(request, 'すでに削除されています。')
             return redirect(to='/app')
 
-        # Messageのsumを増やす
-        good_message.sum += int(count)
-        good_message.save()
 
         # メッセージを設定
         messages.success(request, gd.message.content + 'を追加しました！')
@@ -430,11 +434,10 @@ def gooddelete(request, message_id, good_id):
     if d < 0:
         messages.info(request, '締め切りを過ぎているため削除できません。')
         return redirect(to='/app')
-
-    get_message = Message.objects.filter(id=message_id).first()
-    gd = Good.objects.filter(id=good_id).first()
-    get_message.sum -= int(gd.count)
     try:
+        get_message = Message.objects.filter(id=message_id).first()
+        gd = Good.objects.filter(id=good_id).first()
+        get_message.sum -= int(gd.count)
         get_message.save()
         gd.delete()
     except:
