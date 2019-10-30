@@ -23,8 +23,6 @@ p {
     margin:10px;
 }
 .deadline {
-    float:left;
-    font-weight:normal;
     font-size:12pt;
     color:#f66;
 }

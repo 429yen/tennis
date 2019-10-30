@@ -354,18 +354,15 @@ def gooddetail(request, message_id):
 
 @login_required(login_url='/admin/login/')
 def goodadd(request, message_id, good_id=None ):
-    try:
-        good_message = Message.objects.filter(id=message_id).first()
-    except:
-        messages.info(request, 'すでに削除されています。')
-        return redirect(to='/app')
+    good_message = Message.objects.filter(id=message_id).first()
+    messages.info(request, 'すでに削除されています。')
+    return redirect(to='/app')
+    if good_id:
+        gd = Good.objects.filter(id=good_id).first()
+        # Messageのsumを減らしておく
+        good_message.sum -= int(gd.count)
     else:
-        if good_id:
-            gd = Good.objects.filter(id=good_id).first()
-            # Messageのsumを減らしておく
-            good_message.sum -= int(gd.count)
-        else:
-            gd = Good()
+        gd = Good()
 
     ch = Choice.objects.filter(user=request.user).first()
     # 日付に関する処理
@@ -392,7 +389,11 @@ def goodadd(request, message_id, good_id=None ):
         gd.whose = whose
         gd.count = count
         gd.comment =comment
-        gd.save()
+        try:
+            gd.save()
+        except:
+            messages.info(request, 'すでに削除されています。')
+            return redirect(to='/app')
 
         # Messageのsumを増やす
         good_message.sum += int(count)
@@ -433,16 +434,15 @@ def gooddelete(request, message_id, good_id):
         messages.info(request, '締め切りを過ぎているため削除できません。')
         return redirect(to='/app')
 
+    get_message = Message.objects.filter(id=message_id).first()
+    gd = Good.objects.filter(id=good_id).first()
+    get_message.sum -= int(gd.count)
     try:
-        get_message = Message.objects.filter(id=message_id).first()
-        gd = Good.objects.filter(id=good_id).first()
+        get_message.save()
+        gd.delete()
     except:
         messages.info(request, 'すでに削除されています。')
         return redirect(to='/app')
-    else:
-        get_message.sum -= int(gd.count)
-        get_message.save()
-        gd.delete()
 
     goods = Good.objects.filter(message=get_message)
 
