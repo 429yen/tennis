@@ -1,0 +1,63 @@
+{% extends 'app/layout.html' %}
+
+{% block title %}Index{% endblock %}
+
+{% block header %}
+<h1>Top</h1>
+<p class="caption"></p>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<form action="{% url 'index' %}" method="post">
+{% csrf_token %}
+<input type="hidden" name="mode" value="__search_form__">
+{{search_form}}
+<button>Search</button>
+</form>
+<hr>
+<form action="{% url 'index' %}" method="post">
+{% csrf_token %}
+<input type="hidden" name="mode" value="__check_form__">
+{{check_form}}
+<button>update</button>
+</form>
+<p><strong class="deadline">
+        {% if d >= 0 %}締め切りまで、残り{{ hours }}時間{{ minutes }}分{{ seconds }}秒
+        {% else %}締め切りました。
+        {% endif %}
+</strong></p>
+<hr>
+<table>
+    <tr>
+        <th>商品名</th>
+        <th>種類</th>
+        <th>合計個数</th>
+        <th>値段</th>
+        <th>詳細</th>
+        <th>追加</th>
+        <th>削除</th>
+    </tr>
+{% for item in contents %}
+    <tr>
+        <td><p class="message_content">{{item.content}}</p></td>
+        <td><p class="message_type">
+            {% if item.type == 1 %}<a>飲み物</a>{% endif %}
+            {% if item.type == 2 %}<a>食べ物</a>{% endif %}
+            {% if item.type == 3 %}<a>その他</a>{% endif %}
+        </p></td>
+        <td><span class="message_counter">{{item.sum}}</span></td>
+        <td>{{ item.price }}</td>
+        <td><a href="{% url 'gooddetail' item.id %}"><button>詳細</button></a></td>
+        {% if d >= 0 %}<td><a href="{% url 'goodadd' item.id %}"><button>追加！</button></a></td>{% else %}<td></td>{% endif %}
+        {% if item.sum == 0 %}<td><a href="{% url 'messagedelete' message_id=item.id  %}"><button>削除</button></a></td>{% else %}<td></td>{% endif %}
+    </tr>
+{% endfor %}
+</table>
+{% endblock %}

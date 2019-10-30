@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'app/style.css' %}" />
+</head>
+<body>
+    <div class="body_content">
+        <div class="body_content_inner">
+            <table class="login_table" width="100%">
+                <tr><th width="150px">menu</th><td>
+                    <table class="login_table_inner">
+                        <tr>
+                            <td><a href="{% url 'index' %}">グループ</a> </td>
+                            {% if d >= 0 %}<td><a href="{% url 'post' %}">新規商品</a> </td>{% endif %}
+                            <td><a href="{% url 'myproducts' %}">買い物かご</a> </td>
+                        </tr>
+                    </table>
+                </td> </tr>
+                <tr><th width="150px">login user:</th>
+                    <td>"{{ login_user }}</td>
+                </tr>
+                <tr><th width="150px">group:</th>
+                    <td>"{{ selected_group }}</td>
+                </tr>
+            </table>
+            <div class="header">
+                {% block header %}{% endblock %}
+            </div>
+            <div class="content">
+                {% block content %}{% endblock %}
+            </div>
+            <div class="footer">
+                <hr>
+                <div>
+                    <span style="float:left;font-weight: bold;">
+                        <a href="/admin/logout?next=/app/">
+                            [logout]
+                        </a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

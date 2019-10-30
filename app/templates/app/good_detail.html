@@ -1,0 +1,42 @@
+{% extends 'app/layout.html' %}
+
+{% block title %}詳細{% endblock %}
+
+{% block header %}
+<h1>Detail</h1>
+<p  class="caption">※</p>
+
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<table>
+    <tr>
+        <th>名前</th>
+        <th>個数</th>
+        <th>誰の</th>
+        <th>単価</th>
+        <th>（備考）</th>
+        <th>修正</th>
+        <th>削除</th>
+    </tr>
+{% for good in goods %}
+    <tr>
+        <td>{{ good.message.content }}</td>
+        <td>{{ good.count }}</td>
+        <td>{{ good.whose }}</td>
+        <td>{{ good.message.price }}</td>
+        <td>{{ good.comment }}</td>
+        {% if d >= 0 %}
+        {% if good.owner == login_user or good.whose == login_user %}
+            <td> <a href="{% url 'goodedit' message_id=message.id good_id=good.id  %}"><button>修正</button></a></td>
+            <td> <a href="{% url 'gooddelete' message_id=message.id good_id=good.id %}"><button>削除</button></a></td>
+        {% else %}<td></td><td></td>
+        {% endif %}
+        {% else %}<td></td><td></td>
+        {% endif %}
+    </tr>
+{% endfor %}
+</table>
+</form>
+{% endblock %}
