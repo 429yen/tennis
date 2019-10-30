@@ -36,6 +36,7 @@
 <hr>
 <table>
     <tr>
+        <th>ID</th>
         <th>商品名</th>
         <th>種類</th>
         <th>合計個数</th>
@@ -46,6 +47,7 @@
     </tr>
 {% for item in contents %}
     <tr>
+        <td>{{ item.id }}</td>
         <td><p class="message_content">{{item.content}}</p></td>
         <td><p class="message_type">
             {% if item.type == 1 %}<a>飲み物</a>{% endif %}

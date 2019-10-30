@@ -19,6 +19,7 @@
         <th>（備考）</th>
         <th>修正</th>
         <th>削除</th>
+        <th>追加者</th>
     </tr>
 {% for good in goods %}
     <tr>
@@ -35,6 +36,7 @@
         {% endif %}
         {% else %}<td></td><td></td>
         {% endif %}
+        {% if good.owner == good.whose %}<td></td>{% else %}<td>({{ good.owner }})</td>{% endif %}
     </tr>
 {% endfor %}
 </table>

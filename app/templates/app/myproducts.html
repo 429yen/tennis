@@ -20,7 +20,7 @@
         <th>（備考）</th>
         <th>修正</th>
         <th>削除</th>
-
+        <th>追加者</th>
     </tr>
 {% for good in goods %}
     <tr>
@@ -34,6 +34,7 @@
         <td> <a href="{% url 'goodedit' message_id=good.message.id good_id=good.id %}"><button>edit</button></a></td>
         <td> <a href="{% url 'gooddelete' message_id=good.message.id good_id=good.id %}"><button>delete</button></a></td>
         {% endif %}
+        {% if good.owner == good.whose %}<td></td>{% else %}<td>({{ good.owner }})</td>{% endif %}
     </tr>
 {% endfor %}
 </table>
