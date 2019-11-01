@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 
 from .models import Message,Friend,Group,Good, Choice
-from .forms import GroupCheckForm,GroupSelectForm,SearchForm,FriendsForm,CreateGroupForm,PostForm,GoodAddForm
+from .forms import GroupCheckForm,GroupSelectForm,SearchForm,FriendsForm,CreateGroupForm,PostForm,GoodAddForm,KaikeiForm
 
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
@@ -352,7 +352,7 @@ def gooddetail(request, message_id):
 
 
 @login_required(login_url='/admin/login/')
-def goodadd(request, message_id, good_id=None ):
+def goodadd(request, message_id, good_id=None,):
     good_message = Message.objects.filter(id=message_id).first()
     if good_id:
         gd = Good.objects.filter(id=good_id).first()
@@ -371,6 +371,9 @@ def goodadd(request, message_id, good_id=None ):
     deadline = ch.group.deadline
     d = math.floor((deadline - date).total_seconds())
 
+    # グループのメンバーを取り出す
+    members = ch.group.members.all()
+
 
     if request.method == 'POST':
         # 送信内容の取得
@@ -380,7 +383,7 @@ def goodadd(request, message_id, good_id=None ):
 
         # もし締め切りを過ぎている場合の処理
         if d < 0:
-            messages.info(request, '締め切りを過ぎているため追加できません。')
+            messages.info(request, '締め切りを過ぎているため編集できません。')
             return redirect(to='/app')
 
         # goodを作成して保存
@@ -390,7 +393,7 @@ def goodadd(request, message_id, good_id=None ):
             whose = User.objects.filter(username=whose).first()
             gd.whose = whose
             gd.count = count
-            gd.comment =comment
+            gd.comment = comment
             gd.save()
             # Messageのsumを増やす
             good_message.sum += int(count)
@@ -405,7 +408,7 @@ def goodadd(request, message_id, good_id=None ):
         return redirect(to='/app')
 
     else:
-        form = GoodAddForm(request.user)
+        form = GoodAddForm(request.user, members)
 
     # 共通処理
 
@@ -422,7 +425,7 @@ def goodadd(request, message_id, good_id=None ):
 
 
 @login_required(login_url='/admin/login/')
-def gooddelete(request, message_id, good_id):
+def gooddelete(request, message_id, good_id,):
     ch = Choice.objects.filter(user=request.user).first()
 
     # 日付に関する処理
@@ -484,6 +487,48 @@ def myproducts(request):
     }
 
     return render(request, 'app/myproducts.html', params)
+
+
+@login_required(login_url='/admin/login/')
+def kaikei(request):
+    ch = Choice.objects.filter(user=request.user).first()
+    gr = ch.group
+    mes = Message.objects.filter(group=gr)
+    members = gr.members.all()
+
+    if request.method == 'POST':
+        whose = request.POST['whose']
+        # メッセージのうち、goodがwhoseであるものを取り出す
+        sel_user = User.objects.filter(username=whose).first()
+        goods = Good.objects.filter(message__in=mes).filter(whose=sel_user)
+
+        sum = 0
+        for item in goods:
+            sum += int(item.message.price * item.count)
+
+        kaikeiform = KaikeiForm(members)
+
+    else:
+        sum = 0
+        goods = []
+        kaikeiform = KaikeiForm(members)
+        sel_user = request.user
+
+    # 日付に関する処理
+    date = datetime.datetime.utcnow().replace(tzinfo=timezone.utc)
+    deadline = ch.group.deadline
+    d = math.floor((deadline - date).total_seconds())
+    params = {
+        'login_user': request.user,
+        'goods': goods,
+        'sum': sum,
+        'selected_group': ch.group,
+        'd': d,
+        'kaikeiform': kaikeiform,
+        'sel_user': sel_user,
+    }
+
+    return render(request, 'app/kaikei.html', params)
 
 
 

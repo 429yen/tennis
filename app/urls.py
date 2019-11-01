@@ -13,5 +13,6 @@ urlpatterns = [
     path('goodadd/<int:message_id>', views.goodadd, name='goodadd'),
     path('gooddelete/<int:message_id>/<int:good_id>', views.gooddelete, name='gooddelete'),
     path('goodedit/<int:message_id>/<int:good_id>', views.goodadd, name='goodedit'),
-    path('myproducts', views.myproducts, name='myproducts')
+    path('myproducts', views.myproducts, name='myproducts'),
+    path('kaikei', views.kaikei, name='kaikei'),
 ]

@@ -16,6 +16,7 @@
                             <td><a href="{% url 'index' %}">グループ</a> </td>
                             {% if d >= 0 %}<td><a href="{% url 'post' %}">新規商品</a> </td>{% endif %}
                             <td><a href="{% url 'myproducts' %}">買い物かご</a> </td>
+                            {% if login_user.username == '吉田' %}<td><a href="{% url 'kaikei' %}">会計用</a></td>{% endif %}
                         </tr>
                     </table>
                 </td> </tr>

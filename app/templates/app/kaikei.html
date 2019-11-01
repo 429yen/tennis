@@ -4,6 +4,13 @@
 
 {% block header %}
 <h1>Cart</h1>
+<form action="{% url 'kaikei' %}" method="post">
+{% csrf_token %}
+<input type="hidden" name="mode" >
+{{kaikeiform}}
+<button>Set！</button>
+</form>
+<p class="message_public">選択中のユーザー：{{ sel_user }}</p>
 <p class="message_public">合計金額：{{ sum }}円</p>
 
 {% endblock %}
@@ -30,11 +37,8 @@
         <td>{{ good.whose }}</td>
         <td>{{ good.message.price }}</td>
         <td>{{ good.comment }}</td>
-        {% if d >= 0 %}
         <td> <a href="{% url 'goodedit' message_id=good.message.id good_id=good.id %}"><button>edit</button></a></td>
         <td> <a href="{% url 'gooddelete' message_id=good.message.id good_id=good.id %}"><button>delete</button></a></td>
-        {% else %}<td></td><td></td>
-        {% endif %}
         {% if good.owner == good.whose %}<td></td>{% else %}<td>({{ good.owner }})</td>{% endif %}
     </tr>
 {% endfor %}

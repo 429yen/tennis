@@ -65,11 +65,19 @@ class PostForm(forms.Form):
 
 
 class GoodAddForm(forms.Form):
-    count = forms.IntegerField(max_value=10, )
+    count = forms.IntegerField(max_value=10, min_value=1)
     comment = forms.CharField(max_length=20, required=False)
 
     def __init__(self, user, members=[], *args, **kwargs):
         super(GoodAddForm, self).__init__(*args, **kwargs)
         self.fields['whose'] = forms.ChoiceField(
-            choices=[(user.username, user.username)] + [(item.username, item.username) for item in User.objects.all().exclude(username='public')],
+            choices=[(user.username, user.username)] + [(item.username, item.username) for item in members],
+        )
+
+
+class KaikeiForm(forms.Form):
+    def __init__(self, members=[], *args, **kwargs):
+        super(KaikeiForm, self).__init__(*args, **kwargs)
+        self.fields['whose'] = forms.ChoiceField(
+            choices=[(item.username, item.username) for item in members],
         )
